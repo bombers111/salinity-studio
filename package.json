@@ -1,0 +1,22 @@
+{
+  "name": "salinization",
+  "version": "1.0.0",
+  "description": "Local salinization dashboard backed by the original Excel formulas",
+  "scripts": {
+    "test": "node test.cjs && node build-data.cjs && node test-browser.cjs",
+    "start": "node build-data.cjs && vite --host 127.0.0.1 --port 4173 --strictPort",
+    "prepare-data": "node build-data.cjs",
+    "build": "node build-data.cjs && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4173 --strictPort"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "hyperformula": "^3.5.0"
+  },
+  "devDependencies": {
+    "vite": "^6.4.4"
+  }
+}

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Salinity Studio</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="mark">≈</span><div><strong>Salinity Studio</strong><small>Field decision workspace</small></div></div>
+    <div class="side-caption">WORKSPACE</div>
+    <nav aria-label="Main sections">
+      <a class="active" href="#overview">◉ &nbsp; Overview</a>
+      <a href="#diagnosis">▦ &nbsp; Diagnosis</a>
+      <a href="#projection">⌁ &nbsp; Projection</a>
+      <a href="#measures">✳ &nbsp; Measure decisions</a>
+      <a href="#workbook-controls">☷ &nbsp; Workbook controls</a>
+      <a href="#source-sheets">▤ &nbsp; Source sheets</a>
+    </nav>
+    <div class="sidebar-foot">Built from three original Excel workbooks.<br><span>Browser-only · no field data uploaded</span></div>
+  </aside>
+  <main>
+    <header>
+      <div><div class="eyebrow">FIELD & WATER MANAGEMENT / PROTOTYPE</div><h1>Understand the salt.<br>Plan the response.</h1><p>Diagnose the field, explore a scenario, and compare measures—all in one place.</p></div>
+      <div class="chip">● &nbsp; Runs in your browser</div>
+    </header>
+    <div class="notice"><b>Model boundaries matter.</b> The three workbooks remain separate calculation engines. Shared measurements are entered into each, but their climate, crop and soil assumptions are not automatically reconciled. Results are exploratory—not a field recommendation.</div>
+    <div class="layout" id="overview">
+      <section class="panel controls">
+        <div class="panel-heading"><div><div class="eyebrow">01 / FIELD PROFILE</div><h2>Start with what you know</h2></div><span class="tag">Shared inputs</span></div>
+        <p class="muted">Example measurements are pre-filled. Replace them with observations from your field, or clear values you don't know.</p>
+        <form id="inputs">
+          <label>Soil salinity <span>ECe · dS/m</span><input name="ece" type="number" min="0" max="10000" step="any" value="9" placeholder="Not measured"></label>
+          <label>Irrigation water salinity <span>ECw · dS/m</span><input name="ecw" type="number" min="0" max="10000" step="any" value="2" placeholder="Not measured"></label>
+          <label>Sodium adsorption ratio <span>SAR</span><input name="sar" type="number" min="0" max="10000" step="any" value="10" placeholder="Not measured"></label>
+          <label>Groundwater depth <span>m below ground</span><input name="waterTable" type="number" min="0" max="10000" step="any" value="2.5" placeholder="Not measured"></label>
+          <label>Target crop <span>Scenario workbook</span><select name="crop" id="crop"></select></label>
+          <button type="submit">Update dashboard <span>→</span></button>
+          <div id="status" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+      <section class="results">
+        <div class="panel" id="diagnosis">
+          <div class="panel-heading"><div><div class="eyebrow">02 / DIAGNOSIS WORKBOOK</div><h2>What kind of problem?</h2></div><span class="tag">Live formulas</span></div>
+          <div class="hero-result" id="classification">—</div>
+          <div class="result-grid">
+            <div><small>SOIL SALINITY</small><strong id="salinity">—</strong></div>
+            <div><small>SODICITY</small><strong id="sodicity">—</strong></div>
+            <div><small>IRRIGATION WATER</small><strong id="water">—</strong></div>
+            <div><small>GROUNDWATER</small><strong id="groundwater">—</strong></div>
+          </div>
+          <div class="footnote" id="completeness"></div>
+        </div>
+        <div class="metric-row">
+          <div class="panel metric"><small>SCENARIO · ANNUAL IRRIGATION</small><div><strong id="irrigation">—</strong> <span>mm/year</span></div><p>Exploratory scenario · selected climate preset</p></div>
+          <div class="panel metric"><small>SCENARIO · TARGET CROP</small><div><strong id="planting">—</strong></div><p>Estimated planting year in the scenario workbook</p></div>
+        </div>
+      </section>
+    </div>
+    <section class="panel projection" id="projection">
+      <div class="panel-heading"><div><div class="eyebrow">03 / EXPLORATORY SCENARIO</div><h2>Ten-year salinity trajectory</h2></div><span class="tag">From Excel formulas</span></div>
+      <div class="graph" id="graph"></div>
+      <div class="projection-bottom"><span id="equilibrium">—</span><span id="threshold">—</span></div>
+      <div class="footnote">The scenario uses its own climate and soil inputs. Diagnosis and drainage feasibility are not automatically fed into this projection.</div>
+      <div class="balance-strip"><strong>Original salt & water balance model</strong><span>Optimized irrigation: <b id="balance-irrigation">—</b> mm/year</span><span>Estimated leaching: <b id="balance-leaching">—</b> mm/year</span><span>Manual schedule applied: <b id="manual-irrigation">—</b> mm/year</span><span>Manual irrigation shortage: <b id="manual-shortage">—</b> mm/year</span></div>
+      <div class="footnote">This balance model has different crop and rainfall assumptions. Do not compare its irrigation totals with the scenario as if they describe the same field.</div>
+    </section>
+    <section class="panel" id="measures">
+      <div class="panel-heading"><div><div class="eyebrow">04 / MEASURE SELECTION</div><h2>Explore possible responses</h2></div><span class="tag" id="measure-count">21 measures</span></div>
+      <p class="muted">Suitability comes from the Excel measure formulas. <b>Recommended</b> means potentially suitable; <b>Selected</b> means you added it to your plan. Neither replaces an engineer's assessment.</p>
+      <div class="selection-summary"><strong>Your selected action plan</strong><div id="selected-measures">No measures selected.</div></div>
+      <details class="warning-drawer"><summary>Diagnostic warnings and checks</summary><div id="warnings" class="warnings"></div></details>
+      <div class="measure-tools" role="group" aria-label="Filter measures">
+        <button type="button" class="filter active" data-filter="all" aria-pressed="true">All <span id="all-count">21</span></button>
+        <button type="button" class="filter" data-filter="recommended" aria-pressed="false">Recommended <span id="recommended-count">0</span></button>
+        <button type="button" class="filter" data-filter="selected" aria-pressed="false">Selected <span id="selected-count">0</span></button>
+        <label class="search-field"><span class="sr-only">Search measures</span><input id="measure-search" type="search" placeholder="Search measures…"></label>
+      </div>
+      <div id="catalogue" class="catalogue"></div>
+      <p id="measure-empty" class="empty-state" hidden>No measures match this filter.</p>
+    </section>
+    <section class="panel" id="workbook-controls">
+      <div class="panel-heading"><div><div class="eyebrow">05 / ORIGINAL WORKBOOK CONTROLS</div><h2>Fine-tune the workbooks</h2></div><span class="tag" id="control-count">0 overrides</span></div>
+      <p class="muted">The advanced controls below follow the original Excel cells and dropdowns. Change only what you need; unchanged controls retain workbook defaults. Changed values override matching quick-entry values.</p>
+      <div class="control-tools"><label class="search-field"><span class="sr-only">Find a workbook control</span><input id="control-search" type="search" placeholder="Find a control, crop or cell…"></label><label class="edited-toggle"><input id="edited-only" type="checkbox"> Show only changed</label><button type="button" id="reset-overrides" class="secondary">Clear overrides</button></div>
+      <p class="search-summary" id="control-results"></p>
+      <div id="groups"></div>
+      <div class="control-actions"><span id="control-state">No advanced changes</span><button type="button" id="recalculate">Apply workbook changes →</button></div>
+    </section>
+    <section class="panel" id="source-sheets">
+      <div class="panel-heading"><div><div class="eyebrow">06 / FULL SOURCE REFERENCE</div><h2>Browse the original sheets</h2></div><span class="tag">Live cells</span></div>
+      <p class="muted">Read the criteria, crop tables, explanations and calculated results. Formatting and charts are not replicated; download the Excel files for the exact originals.</p>
+      <div id="downloads" class="downloads"></div>
+      <div class="sheet-controls"><label><span class="sr-only">Workbook</span><select id="book-view"></select></label><label><span class="sr-only">Sheet</span><select id="sheet-view"></select></label><button type="button" id="open-sheet">Open sheet</button></div>
+      <div id="sheet-table" class="sheet-table"><p class="empty-state">Choose a workbook and sheet to browse its cells.</p></div>
+    </section>
+    <footer>Source workbooks: <code>models/</code> · Calculation engine: HyperFormula (GPLv3). Verify outputs in Excel before practical use.</footer>
+  </main>
+</div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

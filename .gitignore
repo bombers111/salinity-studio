@@ -1,0 +1,5 @@
+node_modules/
+dist/
+static/
+public/workbook-data.json
+.DS_Store
