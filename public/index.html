@@ -14,6 +14,7 @@
     <nav aria-label="Main sections">
       <a class="active" href="#overview">◉ &nbsp; Overview</a>
       <a href="#diagnosis">▦ &nbsp; Diagnosis</a>
+      <a href="#gis">◈ &nbsp; Public GIS</a>
       <a href="#projection">⌁ &nbsp; Projection</a>
       <a href="#measures">✳ &nbsp; Measure decisions</a>
       <a href="#workbook-controls">☷ &nbsp; Workbook controls</a>
@@ -30,12 +31,12 @@
     <div class="layout" id="overview">
       <section class="panel controls">
         <div class="panel-heading"><div><div class="eyebrow">01 / FIELD PROFILE</div><h2>Start with what you know</h2></div><span class="tag">Shared inputs</span></div>
-        <p class="muted">Example measurements are pre-filled. Replace them with observations from your field, or clear values you don't know.</p>
+        <p class="muted">The workbook needs lab measurements for a real diagnosis. If you only have public GIS data, leave these blank; the map below cannot substitute for them.</p>
         <form id="inputs">
-          <label>Soil salinity <span>ECe · dS/m</span><input name="ece" type="number" min="0" max="10000" step="any" value="9" placeholder="Not measured"></label>
-          <label>Irrigation water salinity <span>ECw · dS/m</span><input name="ecw" type="number" min="0" max="10000" step="any" value="2" placeholder="Not measured"></label>
-          <label>Sodium adsorption ratio <span>SAR</span><input name="sar" type="number" min="0" max="10000" step="any" value="10" placeholder="Not measured"></label>
-          <label>Groundwater depth <span>m below ground</span><input name="waterTable" type="number" min="0" max="10000" step="any" value="2.5" placeholder="Not measured"></label>
+          <label>Soil salinity <span>ECe · dS/m</span><input name="ece" type="number" min="0" max="10000" step="any" placeholder="Not measured"></label>
+          <label>Irrigation water salinity <span>ECw · dS/m</span><input name="ecw" type="number" min="0" max="10000" step="any" placeholder="Not measured"></label>
+          <label>Sodium adsorption ratio <span>SAR</span><input name="sar" type="number" min="0" max="10000" step="any" placeholder="Not measured"></label>
+          <label>Groundwater depth <span>m below ground</span><input name="waterTable" type="number" min="0" max="10000" step="any" placeholder="Not measured"></label>
           <label>Target crop <span>Scenario workbook</span><select name="crop" id="crop"></select></label>
           <button type="submit">Update dashboard <span>→</span></button>
           <div id="status" role="status" aria-live="polite"></div>
@@ -54,21 +55,35 @@
           <div class="footnote" id="completeness"></div>
         </div>
         <div class="metric-row">
-          <div class="panel metric"><small>SCENARIO · ANNUAL IRRIGATION</small><div><strong id="irrigation">—</strong> <span>mm/year</span></div><p>Exploratory scenario · selected climate preset</p></div>
-          <div class="panel metric"><small>SCENARIO · TARGET CROP</small><div><strong id="planting">—</strong></div><p>Estimated planting year in the scenario workbook</p></div>
+          <div class="panel metric"><small>EXAMPLE SCENARIO · ANNUAL IRRIGATION</small><div><strong id="irrigation">—</strong> <span>mm/year</span></div><p>Exploratory scenario · selected climate preset</p></div>
+          <div class="panel metric"><small>EXAMPLE SCENARIO · TARGET CROP</small><div><strong id="planting">—</strong></div><p>Estimated planting year in the scenario workbook</p></div>
         </div>
       </section>
     </div>
+    <section class="panel gis-panel" id="gis">
+      <div class="panel-heading"><div><div class="eyebrow">03 / PUBLIC DATA ONLY</div><h2>Salinity context map</h2></div><span class="tag">GIS screening · not ECe</span></div>
+      <p class="muted">Explore a public FAO soil-salinity indicator alongside a street map. This is a coarse regional context layer—not a soil test, a live forecast, or an input to the model.</p>
+      <div class="gis-tools">
+        <button type="button" id="gis-world" class="secondary">World view</button>
+        <button type="button" id="gis-iraq" class="secondary">Iraq example</button>
+        <label class="gis-switch"><input type="checkbox" id="gis-layer" checked> Show FAO indicator</label>
+        <label class="gis-opacity">Opacity <input id="gis-opacity" type="range" min="0" max="100" value="65" aria-label="Indicator layer opacity"></label>
+      </div>
+      <div id="gis-map" role="region" aria-label="Interactive salinity screening map"></div>
+      <div class="gis-legend"><span><i class="gis-low"></i> lower indicator</span><span><i class="gis-mid"></i> intermediate</span><span><i class="gis-high"></i> higher indicator</span><span id="gis-coordinates">Move the map to explore</span></div>
+      <p class="gis-caveat"><strong>Do not read these colours as ECe (dS/m).</strong> Source: <a href="https://data.fao.org/catalog/dataset/83b17a94-ee3e-4163-ab60-418a2451950a" target="_blank" rel="noopener noreferrer">FAO GDVI Soil salinity indicator</a>, 0.05° source grid, published 2026, CC BY 4.0. Display resampled for web viewing. Basemap © OpenStreetMap contributors via OpenFreeMap. The app saves no locations; the basemap provider receives tile requests for the area viewed.</p>
+      <p id="gis-error" class="muted" role="status"></p>
+    </section>
     <section class="panel projection" id="projection">
-      <div class="panel-heading"><div><div class="eyebrow">03 / EXPLORATORY SCENARIO</div><h2>Ten-year salinity trajectory</h2></div><span class="tag">From Excel formulas</span></div>
+      <div class="panel-heading"><div><div class="eyebrow">04 / EXPLORATORY SCENARIO</div><h2>Ten-year salinity trajectory</h2></div><span class="tag">From Excel formulas</span></div>
       <div class="graph" id="graph"></div>
       <div class="projection-bottom"><span id="equilibrium">—</span><span id="threshold">—</span></div>
-      <div class="footnote">The scenario uses its own climate and soil inputs. Diagnosis and drainage feasibility are not automatically fed into this projection.</div>
+      <div class="footnote">Without measured inputs, this trajectory uses the workbook's example soil, water, crop and climate values. It is <strong>not a forecast for a location on the GIS map</strong>. Diagnosis and drainage feasibility are not automatically fed into it.</div>
       <div class="balance-strip"><strong>Original salt & water balance model</strong><span>Optimized irrigation: <b id="balance-irrigation">—</b> mm/year</span><span>Estimated leaching: <b id="balance-leaching">—</b> mm/year</span><span>Manual schedule applied: <b id="manual-irrigation">—</b> mm/year</span><span>Manual irrigation shortage: <b id="manual-shortage">—</b> mm/year</span></div>
       <div class="footnote">This balance model has different crop and rainfall assumptions. Do not compare its irrigation totals with the scenario as if they describe the same field.</div>
     </section>
     <section class="panel" id="measures">
-      <div class="panel-heading"><div><div class="eyebrow">04 / MEASURE SELECTION</div><h2>Explore possible responses</h2></div><span class="tag" id="measure-count">21 measures</span></div>
+      <div class="panel-heading"><div><div class="eyebrow">05 / MEASURE SELECTION</div><h2>Explore possible responses</h2></div><span class="tag" id="measure-count">21 measures</span></div>
       <p class="muted">Suitability comes from the Excel measure formulas. <b>Recommended</b> means potentially suitable; <b>Selected</b> means you added it to your plan. Neither replaces an engineer's assessment.</p>
       <div class="selection-summary"><strong>Your selected action plan</strong><div id="selected-measures">No measures selected.</div></div>
       <details class="warning-drawer"><summary>Diagnostic warnings and checks</summary><div id="warnings" class="warnings"></div></details>
@@ -82,7 +97,7 @@
       <p id="measure-empty" class="empty-state" hidden>No measures match this filter.</p>
     </section>
     <section class="panel" id="workbook-controls">
-      <div class="panel-heading"><div><div class="eyebrow">05 / ORIGINAL WORKBOOK CONTROLS</div><h2>Fine-tune the workbooks</h2></div><span class="tag" id="control-count">0 overrides</span></div>
+      <div class="panel-heading"><div><div class="eyebrow">06 / ORIGINAL WORKBOOK CONTROLS</div><h2>Fine-tune the workbooks</h2></div><span class="tag" id="control-count">0 overrides</span></div>
       <p class="muted">The advanced controls below follow the original Excel cells and dropdowns. Change only what you need; unchanged controls retain workbook defaults. Changed values override matching quick-entry values.</p>
       <div class="control-tools"><label class="search-field"><span class="sr-only">Find a workbook control</span><input id="control-search" type="search" placeholder="Find a control, crop or cell…"></label><label class="edited-toggle"><input id="edited-only" type="checkbox"> Show only changed</label><button type="button" id="reset-overrides" class="secondary">Clear overrides</button></div>
       <p class="search-summary" id="control-results"></p>
@@ -90,7 +105,7 @@
       <div class="control-actions"><span id="control-state">No advanced changes</span><button type="button" id="recalculate">Apply workbook changes →</button></div>
     </section>
     <section class="panel" id="source-sheets">
-      <div class="panel-heading"><div><div class="eyebrow">06 / FULL SOURCE REFERENCE</div><h2>Browse the original sheets</h2></div><span class="tag">Live cells</span></div>
+      <div class="panel-heading"><div><div class="eyebrow">07 / FULL SOURCE REFERENCE</div><h2>Browse the original sheets</h2></div><span class="tag">Live cells</span></div>
       <p class="muted">Read the criteria, crop tables, explanations and calculated results. Formatting and charts are not replicated; download the Excel files for the exact originals.</p>
       <div id="downloads" class="downloads"></div>
       <div class="sheet-controls"><label><span class="sr-only">Workbook</span><select id="book-view"></select></label><label><span class="sr-only">Sheet</span><select id="sheet-view"></select></label><button type="button" id="open-sheet">Open sheet</button></div>

@@ -1,4 +1,5 @@
 import {calculate, sheet as readSheet} from './local-api.js';
+import {initGis} from './gis.js';
 const $ = id => document.getElementById(id);
 const form = $('inputs');
 const advanced = {};
@@ -265,4 +266,5 @@ async function update() {
 form.addEventListener('submit', event => { event.preventDefault(); update(); });
 form.addEventListener('change', () => { $('status').textContent = 'Inputs changed. Update the dashboard to recalculate.'; });
 $('crop').add(new Option('Barley','Barley'));
+initGis();
 update();

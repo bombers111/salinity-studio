@@ -8,7 +8,10 @@ const fs=require('node:fs/promises');
  try{
   const api=await vite.ssrLoadModule('/local-api.js');
   const sample={ece:9,ecw:2,sar:10,waterTable:2.5,crop:'Barley'};
-  let result=await api.calculate({...sample,fields:{},selections:{}});
+  let result=await api.calculate({ece:'',ecw:'',sar:'',waterTable:'',crop:'Barley',fields:{},selections:{}});
+  assert.equal(result.result.diagnosis.classification,'Insufficient data');
+  assert.equal(result.result.scenario.crop,'Barley');
+  result=await api.calculate({...sample,fields:{},selections:{}});
   assert.equal(result.result.diagnosis.classification,"Saline Soil ('White Alkali')");
   assert.equal(result.result.scenario.plantingYear,'Year 2');
   assert.equal(result.result.diagnosis.selected.length,0);
